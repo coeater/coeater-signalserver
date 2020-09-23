@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon --exec ts-node src/index.ts",
-    "test": "NODE_ENV=test jest"
+    "test": "NODE_ENV=test jest",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint --fix src/**/*.ts"
   },
   "repository": {
     "type": "git",
