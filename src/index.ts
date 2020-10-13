@@ -61,8 +61,8 @@ io.sockets.on('connection', function(socket) {
     socket.broadcast.to(answer.room).emit('offer', answer.sessionDescription)
   });
 
-  socket.on('send candidate', function(candidate) {
-    socket.broadcast.to(candidate.room).emit('candidate', candidate)
+  socket.on('send iceCandidate', function(candidate) {
+    socket.broadcast.to(candidate.room).emit('candidate', candidate.iceCandidate)
   })
 
   socket.on('hangup', function(reason) {
