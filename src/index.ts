@@ -32,6 +32,8 @@ io.sockets.on('connection', function(socket) {
     socket.emit('log', input);
   }
 
+  log("connected!")
+
   socket.on('create or join', function(room) {
     log('Received request to create or join room ' + room);
     const numClients: number = Object.keys(io.sockets.sockets).length;
@@ -47,22 +49,37 @@ io.sockets.on('connection', function(socket) {
       io.sockets.in(room).emit('join', room);
       socket.join(room);
       socket.emit('joined', room, socket.id);
-      io.sockets.in(room).emit('ready');
+      socket.emit('ready', true, socket.id);
+      socket.broadcast.to(room).emit('ready', false)
     } else {
       socket.emit('full', room);
     }
   });
 
   socket.on('offer', function(offer) {
-    socket.broadcast.to(offer.room).emit('offer', offer.sessionDescription)
+    // log(offer)
+    let data = JSON.parse(offer);
+    log("offer")
+    log(data["room"])
+    log(data["sessionDescription"])
+    socket.broadcast.to(data.room).emit('offer', data.sessionDescription)
   });
 
   socket.on('answer', function(answer) {
-    socket.broadcast.to(answer.room).emit('offer', answer.sessionDescription)
+    log("answer")
+    let data = JSON.parse(answer);
+    log(data["room"])
+    log(data["sessionDescription"])
+    socket.broadcast.to(data.room).emit('answer', data.sessionDescription)
   });
 
   socket.on('send iceCandidate', function(candidate) {
-    socket.broadcast.to(candidate.room).emit('candidate', candidate.iceCandidate)
+    let data = JSON.parse(candidate);
+    log("candidate")
+    log(data["room"])
+    log(data)
+
+    socket.broadcast.to(data.room).emit('candidate', data)
   })
 
   socket.on('hangup', function(reason) {
