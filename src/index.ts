@@ -20,8 +20,8 @@ const options = {
 const server = http.createServer(app.callback());
 
 const io = socketIO(server);
-server.listen(3000, () => {
-  console.log('Application is starting on port 3000')
+server.listen(4000, () => {
+  console.log('Application is starting on port 4000')
 })
 
 io.sockets.on('connection', function(socket) {
@@ -31,6 +31,8 @@ io.sockets.on('connection', function(socket) {
     console.log(input)
     socket.emit('log', input);
   }
+
+  log("connected!")
 
   socket.on('create or join', function(room) {
     log('Received request to create or join room ' + room);
@@ -54,6 +56,7 @@ io.sockets.on('connection', function(socket) {
   });
 
   socket.on('offer', function(offer) {
+    // log(offer)
     let data = JSON.parse(offer);
     log("offer")
     log(data["room"])
@@ -62,15 +65,20 @@ io.sockets.on('connection', function(socket) {
   });
 
   socket.on('answer', function(answer) {
-    let data = JSON.parse(answer);
     log("answer")
+    let data = JSON.parse(answer);
     log(data["room"])
     log(data["sessionDescription"])
-    socket.broadcast.to(data.room).emit('offer', data.sessionDescription)
+    socket.broadcast.to(data.room).emit('answer', data.sessionDescription)
   });
 
   socket.on('send iceCandidate', function(candidate) {
-    socket.broadcast.to(candidate.room).emit('candidate', candidate.iceCandidate)
+    let data = JSON.parse(candidate);
+    log("candidate")
+    log(data["room"])
+    log(data)
+
+    socket.broadcast.to(data.room).emit('candidate', data)
   })
 
   socket.on('hangup', function(reason) {
