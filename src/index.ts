@@ -34,31 +34,39 @@ io.sockets.on('connection', function(socket) {
 
   socket.on('create or join', function(room) {
     log('Received request to create or join room ' + room);
-    const numClients: number = Object.keys(io.sockets.sockets).length;
+    const myRoom = io.sockets.adapter.rooms[room] || {length: 0};
+    const numClients = myRoom.length;
     log('Room ' + room + ' now has ' + numClients + ' client(s)');
 
     if (numClients === 1) {
       socket.join(room);
       log('Client ID ' + socket.id + ' created room ' + room);
       socket.emit('created', room, socket.id);
-
     } else if (numClients === 2) {
       log('Client ID ' + socket.id + ' joined room ' + room);
       io.sockets.in(room).emit('join', room);
       socket.join(room);
-      socket.emit('joined', room, socket.id);
-      io.sockets.in(room).emit('ready');
+      socket.emit('ready', true, socket.id);
+      socket.broadcast.to(room).emit('ready', false);
     } else {
       socket.emit('full', room);
     }
   });
 
   socket.on('offer', function(offer) {
-    socket.broadcast.to(offer.room).emit('offer', offer.sessionDescription)
+    let data = JSON.parse(offer);
+    log("offer")
+    log(data["room"])
+    log(data["sessionDescription"])
+    socket.broadcast.to(data.room).emit('offer', data.sessionDescription)
   });
 
   socket.on('answer', function(answer) {
-    socket.broadcast.to(answer.room).emit('offer', answer.sessionDescription)
+    let data = JSON.parse(answer);
+    log("answer")
+    log(data["room"])
+    log(data["sessionDescription"])
+    socket.broadcast.to(data.room).emit('offer', data.sessionDescription)
   });
 
   socket.on('send iceCandidate', function(candidate) {
@@ -67,11 +75,12 @@ io.sockets.on('connection', function(socket) {
 
   socket.on('hangup', function(reason) {
     console.log(`Peer or server disconnected. Reason: ${reason}.`);
+    socket.leaveAll();
     socket.broadcast.emit('bye');
   });
 
   socket.on('bye', function(room) {
-    console.log(`Peer said bye on room ${room}.`);
+    socket.leaveAll();
   });
 
 });
