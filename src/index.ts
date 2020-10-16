@@ -26,6 +26,8 @@ server.listen(4000, () => {
 
 io.sockets.on('connection', function(socket) {
 
+  let roomName: string;
+
   // convenience function to log server messages on the client
   function log(input: string) {
     console.log(input)
@@ -38,6 +40,7 @@ io.sockets.on('connection', function(socket) {
     log('Received request to create or join room ' + room);
     const myRoom = io.sockets.adapter.rooms[room] || {length: 0};
     const numClients = myRoom.length;
+    roomName = room;
     log('Room ' + room + ' now has ' + numClients + ' client(s)');
 
     if (numClients === 1) {
@@ -55,40 +58,37 @@ io.sockets.on('connection', function(socket) {
     }
   });
 
-  socket.on('offer', function(offer) {
-    // log(offer)
-    let data = JSON.parse(offer);
-    log("offer")
-    log(data["room"])
-    log(data["sessionDescription"])
-    socket.broadcast.to(data.room).emit('offer', data.sessionDescription)
+  socket.on('offer', function(sessionDescription) {
+    // let data = JSON.parse(offer);
+    // log("offer")
+    // log(data["room"])
+    // log(data["sessionDescription"])
+    socket.broadcast.to(roomName).emit('offer', sessionDescription)
   });
 
-  socket.on('answer', function(answer) {
-    log("answer")
-    let data = JSON.parse(answer);
-    log(data["room"])
-    log(data["sessionDescription"])
-    socket.broadcast.to(data.room).emit('answer', data.sessionDescription)
+  socket.on('answer', function(sessionDescription) {
+    // log("answer")
+    // let data = JSON.parse(answer);
+    // log(data["room"])
+    // log(data["sessionDescription"])
+    socket.broadcast.to(roomName).emit('answer', sessionDescription)
   });
 
   socket.on('send iceCandidate', function(candidate) {
-    let data = JSON.parse(candidate);
-    log("candidate")
-    log(data["room"])
-    log(data)
-
-    socket.broadcast.to(data.room).emit('candidate', data)
+    // let data = JSON.parse(candidate);
+    // log("candidate")
+    // log(data["room"])
+    // log(data)
+    socket.broadcast.to(roomName).emit('candidate', candidate)
   })
 
   socket.on('hangup', function(reason) {
-    console.log(`Peer or server disconnected. Reason: ${reason}.`);
-    socket.leaveAll();
+    socket.leave(roomName);
     socket.broadcast.emit('bye');
   });
 
-  socket.on('bye', function(room) {
-    socket.leaveAll();
+  socket.on('bye', function() {
+    socket.leave(roomName);
   });
 
 });
