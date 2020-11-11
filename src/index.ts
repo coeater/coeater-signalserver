@@ -91,4 +91,15 @@ io.sockets.on('connection', function(socket) {
     socket.leave(roomName);
   });
 
+  /*********** Gamification *********/ 
+
+  socket.on('start likeness', function(param){
+    log("start game likeness")
+    let gameData = {
+      "leftMember": ["삼계탕", "김밥", "스테이크", "짜장면", "부먹"],
+      "rightMember": ["곰탕", "순대", "알리오 올리오 파스타", "짬뽕", "찍먹"],
+    }
+    socket.to(roomName).emit('play likeness', gameData)
+  })
+
 });
