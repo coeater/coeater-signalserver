@@ -5,12 +5,32 @@ const app = new Koa();
 import os from 'os';
 import http from 'http'; // use require('https') for https
 import socketIO from 'socket.io';
-// const fs = require("fs");
-const options = {
-  // for https:
-  //key: fs.readFileSync('key.pem'),
-  //cert: fs.readFileSync('cert.pem')
-};
+const fs = require("fs");
+
+let sampleData = ["삼계탕", "김밥", "스테이크", "짜장면", "부먹",
+          "곰탕", "순대", "알리오 올리오 파스타", "짬뽕", "찍먹"]
+
+class GameInfo {
+  stage: number;
+  previousResult!: string;
+  itemLeft: string;
+  itemRight: string;
+  imageLeft: string;
+  imageRight: string;
+
+  constructor(stage: number, itemLeft: string, itemRight: string, imageLeft: string, imageRight: string){
+    this.stage = stage;
+    this.itemLeft = itemLeft;
+    this.itemRight = itemRight;
+    this.imageLeft = imageLeft;
+    this.imageRight = imageRight;
+  }
+}
+// const options = {
+//   for https:
+//   key: fs.readFileSync('key.pem'),
+//   cert: fs.readFileSync('cert.pem')
+// };
 
 // app.use((ctx: Context) => { ctx.body = 'hello, Jacob!'; });
 // app.listen(4000,
@@ -92,14 +112,33 @@ io.sockets.on('connection', function(socket) {
   });
 
   /*********** Gamification *********/ 
-
-  socket.on('start likeness', function(param){
+  socket.on('start likeness', function(){
+    log(__dirname)
     log("start game likeness")
-    let gameData = {
-      "leftMember": ["삼계탕", "김밥", "스테이크", "짜장면", "부먹"],
-      "rightMember": ["곰탕", "순대", "알리오 올리오 파스타", "짬뽕", "찍먹"],
+    let imageAsBase64 = fs.readFileSync(__dirname + '/images/sample.png', 'base64');
+    let gameInfo = new GameInfo(0, sampleData[0], sampleData[5], imageAsBase64, imageAsBase64)
+    socket.to(roomName).emit('play likeness', gameInfo)
+    // socket.emit('play likeness', gameInfo)
+  })
+
+  /* 매 라운드가 끝난 결과를 받으면 결과 일치 여부와 다음 라운드 정보를 전송 */
+  socket.on('likeness result', function(gameInfo){
+    let data = JSON.parse(gameInfo);
+    let stage = data["stage"]
+    let previousResult: string = stage ? 'same' : 'diff'
+
+    if(stage == 10) {
+      socket.to(roomName).emit('end likeness', previousResult)
+      // socket.emit('end likeness', previousResult)
+      return
     }
-    socket.to(roomName).emit('play likeness', gameData)
+
+    let imageAsBase64 = fs.readFileSync(__dirname + '/images/sample.png', 'base64');
+    let nextGameInfo = new GameInfo(stage+1, sampleData[stage+1], sampleData[stage+6], imageAsBase64, imageAsBase64)
+    nextGameInfo.previousResult = previousResult
+  
+    socket.to(roomName).emit('play likeness', nextGameInfo)
+    // socket.emit('play likeness', nextGameInfo)
   })
 
 });
