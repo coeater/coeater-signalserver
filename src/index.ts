@@ -104,7 +104,7 @@ io.sockets.on('connection', function(socket) {
 
     let imageLeft = "https://github.com/coeater/coeater-signalserver/blob/master/src/images/01L.jpg?raw=true";
     let imageRight = "https://github.com/coeater/coeater-signalserver/blob/master/src/images/01R.jpg?raw=true";
-    let gameInfo = new GameInfo(0, sampleData[0], sampleData[5], imageLeft, imageRight)
+    let gameInfo = new GameInfo(1, sampleData[0], sampleData[5], imageLeft, imageRight)
     socket.to(roomName).emit('play likeness', gameInfo)
     socket.emit('play likeness', gameInfo)
     // socket.emit('play likeness', gameInfo)
