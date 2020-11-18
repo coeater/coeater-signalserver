@@ -1,7 +1,6 @@
 
 export class GameInfo {
   stage: number;
-  previousResult!: string;
   itemLeft: string;
   itemRight: string;
   imageLeft: string;

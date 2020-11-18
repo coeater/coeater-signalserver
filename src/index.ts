@@ -100,11 +100,11 @@ io.sockets.on('connection', function(socket) {
 
   /*********** Gamification *********/ 
   socket.on('start likeness', function(){
-    log(__dirname)
     log("start game likeness")
 
-    let imageAsBase64 = "https://github.com/seemarket/seemarket-product/blob/master/11.jpg?raw=true";
-    let gameInfo = new GameInfo(0, sampleData[0], sampleData[5], imageAsBase64, imageAsBase64)
+    let imageLeft = "https://github.com/coeater/coeater-signalserver/blob/master/src/images/01L.jpg?raw=true";
+    let imageRight = "https://github.com/coeater/coeater-signalserver/blob/master/src/images/01R.jpg?raw=true";
+    let gameInfo = new GameInfo(0, sampleData[0], sampleData[5], imageLeft, imageRight)
     socket.to(roomName).emit('play likeness', gameInfo)
     socket.emit('play likeness', gameInfo)
     // socket.emit('play likeness', gameInfo)
@@ -120,8 +120,14 @@ io.sockets.on('connection', function(socket) {
     console.log("data received");
     if (cacher.can_get_result(roomName, gameSelect.stage)) {
       const isMatched = cacher.is_matched(roomName);
-      let imageAsBase64 = "https://github.com/seemarket/seemarket-product/blob/master/11.jpg?raw=true";
-      let gameInfo = new GameInfo(0, sampleData[0], sampleData[5], imageAsBase64, imageAsBase64)
+      const nextStage = gameSelect.stage+1;
+      let stageUrl = nextStage.toString()
+      if(stageUrl.length == 1){
+        stageUrl = "0"+stageUrl
+      }
+      let imageLeft = "https://github.com/coeater/coeater-signalserver/blob/master/src/images/"+stageUrl+"L.jpg?raw=true";
+      let imageRight = "https://github.com/coeater/coeater-signalserver/blob/master/src/images/"+stageUrl+"R.jpg?raw=true";
+      let gameInfo = new GameInfo(nextStage, sampleData[0], sampleData[5], imageLeft, imageRight)
 
       const matchResult = new GameMatchResult(isMatched, gameInfo);
       console.log(matchResult)
