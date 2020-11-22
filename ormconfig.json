@@ -1,0 +1,24 @@
+{
+  "type": "mysql",
+  "host": "ec2-52-78-98-130.ap-northeast-2.compute.amazonaws.com",
+  "port": 3306,
+  "username": "coeater",
+  "password": "coeater",
+  "database": "coeater",
+  "synchronize": true,
+  "logging": false,
+  "entities": [
+    "src/entity/*.ts"
+  ],
+  "migrations": [
+    "src/migration/**/*.ts"
+  ],
+  "subscribers": [
+    "src/subscriber/**/*.ts"
+  ],
+  "cli": {
+    "entitiesDir": "src/entity",
+    "migrationsDir": "src/migration",
+    "subscribersDir": "src/subscriber"
+  }
+}
