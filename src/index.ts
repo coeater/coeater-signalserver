@@ -127,6 +127,16 @@ createConnection().then(async connection => {
       }
     })
 
+    socket.on('delete emoji', function(request) {
+      log(request)
+      socket.broadcast.to(roomName).emit('delete emoji', request)
+    })
+
+    socket.on('emoji', function(request) {
+      log(request)
+      socket.broadcast.to(roomName).emit('emoji', request)
+    })
+
   });
 
 }).catch(error => console.log(error));
