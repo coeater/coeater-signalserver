@@ -137,6 +137,20 @@ createConnection().then(async connection => {
       socket.broadcast.to(roomName).emit('emoji', request)
     })
 
+
+    //Youtube Sync Features
+    socket.on('youtube sync push', function(request) {
+      socket.broadcast.to(roomName).emit('youtube sync update', request)
+    })
+
+    socket.on('youtube sync response', function(request) {
+      socket.broadcast.to(roomName).emit('youtube sync update', request)
+    })
+
+    socket.on('youtube sync requset', function(request) {
+      socket.broadcast.to(roomName).emit('youtube sync pull', request)
+    })
+
   });
 
 }).catch(error => console.log(error));
