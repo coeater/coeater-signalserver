@@ -147,7 +147,7 @@ createConnection().then(async connection => {
       socket.broadcast.to(roomName).emit('youtube sync update', request)
     })
 
-    socket.on('youtube sync requset', function(request) {
+    socket.on('youtube sync request', function(request) {
       socket.broadcast.to(roomName).emit('youtube sync pull', request)
     })
 
